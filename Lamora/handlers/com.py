@@ -1,6 +1,6 @@
 from telethon import events
-from lamora.database import aku as db
-from lamora.utils.tol import admin_only, extract_user_id, extract_text
+from Lamora.database import aku as db
+from Lamora.utils.tol import admin_only, extract_user_id, extract_text
 
 def register(client):
     @client.on(events.NewMessage(pattern="/start"))
