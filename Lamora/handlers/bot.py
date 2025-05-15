@@ -1,13 +1,8 @@
-import asyncio
-import os
-import subprocess
-import sys
-from telethon import events
-from lamora.utils.tol import admin_only
+from lamora.utils.tol import dev_only
 
 def register(client):
     @client.on(events.NewMessage(pattern="/reboot"))
-    @admin_only
+    @dev_only
     async def reboot_handler(event):
         msg = await event.reply("Menjalankan `git pull`...")
         result = subprocess.run(["git", "pull"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
