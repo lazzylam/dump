@@ -1,5 +1,5 @@
 import asyncio
-from lamora.config import developer_ids
+from Lamora.config import developer_ids
 
 async def is_developer(event):
     return event.sender_id in developer_ids
