@@ -1,19 +1,35 @@
 import asyncio
+from lamora.config import developer_ids  # list of user_id from .env
+
+async def is_developer(event):
+    return event.sender_id in developer_ids
 
 async def is_group_admin(event):
-    if not event.is_group:
-        return False
-
     try:
-        perms = await event.client.get_permissions(event.chat_id, event.sender_id)
-        return perms.is_admin or perms.is_creator
+        if event.is_group:
+            p = await event.client.get_permissions(event.chat_id, event.sender_id)
+            return p.is_admin
     except:
-        return False
+        pass
+    return False
 
-def admin_only(func):
+async def is_authorized(event):
+    return await is_developer(event) or await is_group_admin(event)
+
+def authorized_only(func):
     async def wrapper(event):
-        if not await is_group_admin(event):
-            msg = await event.reply("Perintah ini hanya untuk admin grup.")
+        if not await is_authorized(event):
+            msg = await event.reply("Hanya admin atau developer yang bisa menggunakan perintah ini.")
+            await asyncio.sleep(2)
+            await msg.delete()
+            return
+        await func(event)
+    return wrapper
+
+def developer_only(func):
+    async def wrapper(event):
+        if not await is_developer(event):
+            msg = await event.reply("Hanya developer yang bisa menggunakan perintah ini.")
             await asyncio.sleep(2)
             await msg.delete()
             return
@@ -25,10 +41,8 @@ async def extract_user_id(event):
         reply = await event.get_reply_message()
         return reply.sender_id if reply else None
     try:
-        parts = event.text.split(" ", 1)
-        if len(parts) > 1:
-            return int(parts[1])
-    except Exception:
+        return int(event.text.split(" ", 1)[1])
+    except:
         return None
 
 async def extract_text(event):
@@ -36,8 +50,6 @@ async def extract_text(event):
         reply = await event.get_reply_message()
         return reply.raw_text.strip() if reply else None
     try:
-        parts = event.text.split(" ", 1)
-        if len(parts) > 1:
-            return parts[1].strip()
-    except Exception:
+        return event.text.split(" ", 1)[1].strip()
+    except:
         return None
