@@ -1,4 +1,5 @@
 import asyncio
+from functools import wraps
 from Lamora.config import developer_ids
 
 async def is_developer(event):
@@ -12,6 +13,7 @@ async def is_group_admin(event):
     return participant.is_admin or participant.is_creator
 
 def admin_only(func):
+    @wraps(func)
     async def wrapper(event):
         if not (await is_developer(event) or await is_group_admin(event)):
             msg = await event.reply("Hanya admin grup atau developer yang bisa menggunakan perintah ini.")
@@ -22,6 +24,7 @@ def admin_only(func):
     return wrapper
 
 def dev_only(func):
+    @wraps(func)
     async def wrapper(event):
         if not await is_developer(event):
             msg = await event.reply("Hanya developer yang bisa menggunakan perintah ini.")
