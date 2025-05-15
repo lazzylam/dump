@@ -1,6 +1,6 @@
 from telethon import TelegramClient
-from lamora.config import api_id, api_hash, bot_token
-from lamora.handlers import com, bot
+from Lamora.config import api_id, api_hash, bot_token
+from Lamora.handlers import com, bot
 
 client = TelegramClient("bot", api_id, api_hash).start(bot_token=bot_token)
 
