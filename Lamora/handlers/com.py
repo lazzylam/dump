@@ -3,73 +3,26 @@ from Lamora.database import aku as db
 from Lamora.utils.tol import admin_only, extract_user_id, extract_text
 
 def register(client):
-    @client.on(events.NewMessage(pattern="/start"))
-    async def start(event):
-        await db.init_db()
-        await event.reply("Bot aktif dan siap digunakan.")
-
-    # -- BLACKLIST USER --
-    @client.on(events.NewMessage(pattern="/addbl"))
-    @admin_only
-    async def add_blacklist_user(event):
-        uid = await extract_user_id(event)
-        if uid:
-            await db.add_user_blacklist(uid)
-            await event.reply(f"User `{uid}` ditambahkan ke blacklist.")
-        else:
-            await event.reply("Format salah. Gunakan /addbl <user_id> atau reply.")
-
-    # -- BLACKLIST WORD --
-    @client.on(events.NewMessage(pattern="/bl"))
-    @admin_only
-    async def add_blacklist_word(event):
-        word = await extract_text(event)
-        if word:
-            await db.add_word_blacklist(word)
-            await event.reply(f"Kata `{word}` ditambahkan ke blacklist.")
-        else:
-            await event.reply("Format salah. Gunakan /bl <kata> atau reply.")
-
-    # -- LIST BLACKLIST --
-    @client.on(events.NewMessage(pattern="/listbl"))
-    @admin_only
-    async def list_blacklist(event):
-        users = await db.list_blacklist_users()
-        words = await db.list_blacklist_words()
-        user_list = "\n".join(str(u[0]) for u in users) or "Kosong"
-        word_list = "\n".join(w[0] for w in words) or "Kosong"
-        await event.reply(f"**Blacklist Users:**\n{user_list}\n\n**Blacklist Words:**\n{word_list}")
-
-    # -- CLEAR BLACKLIST --
-    @client.on(events.NewMessage(pattern="/clearbl"))
-    @admin_only
-    async def clear_blacklist(event):
-        await db.clear_blacklist()
-        await event.reply("Seluruh data blacklist telah dihapus.")
-
-    # -- WHITELIST USER --
     @client.on(events.NewMessage(pattern="/addwhite"))
     @admin_only
     async def add_whitelist_user(event):
         uid = await extract_user_id(event)
         if uid:
             await db.add_user_whitelist(uid)
-            await event.reply(f"User `{uid}` ditambahkan ke whitelist.")
+            await event.reply(f"User `{uid}` berhasil ditambahkan ke whitelist.")
         else:
-            await event.reply("Format salah. Gunakan /addwhite <user_id> atau reply.")
+            await event.reply("Format salah. Gunakan /addwhite <user_id> atau balas pesan user.")
 
-    # -- WHITELIST WORD --
     @client.on(events.NewMessage(pattern="/white"))
     @admin_only
     async def add_whitelist_word(event):
         word = await extract_text(event)
         if word:
             await db.add_word_whitelist(word)
-            await event.reply(f"Kata `{word}` ditambahkan ke whitelist.")
+            await event.reply(f"Kata `{word}` berhasil ditambahkan ke whitelist.")
         else:
-            await event.reply("Format salah. Gunakan /white <kata> atau reply.")
+            await event.reply("Format salah. Gunakan /white <kata> atau balas pesan.")
 
-    # -- LIST WHITELIST --
     @client.on(events.NewMessage(pattern="/listwhite"))
     @admin_only
     async def list_whitelist(event):
@@ -79,9 +32,8 @@ def register(client):
         word_list = "\n".join(w[0] for w in words) or "Kosong"
         await event.reply(f"**Whitelist Users:**\n{user_list}\n\n**Whitelist Words:**\n{word_list}")
 
-    # -- CLEAR WHITELIST --
     @client.on(events.NewMessage(pattern="/clearwhite"))
     @admin_only
     async def clear_whitelist(event):
         await db.clear_whitelist()
-        await event.reply("Seluruh data whitelist telah dihapus.")
+        await event.reply("Whitelist users dan words sudah dikosongkan.")
