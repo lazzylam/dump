@@ -1,13 +1,19 @@
 import asyncio
-from lamora.config import admin_ids  # disesuaikan sesuai struktur folder
 
-async def is_admin(event):
-    return event.sender_id in admin_ids
+async def is_group_admin(event):
+    if not event.is_group:
+        return False
+
+    try:
+        perms = await event.client.get_permissions(event.chat_id, event.sender_id)
+        return perms.is_admin or perms.is_creator
+    except:
+        return False
 
 def admin_only(func):
     async def wrapper(event):
-        if not await is_admin(event):
-            msg = await event.reply("Hanya admin yang bisa menggunakan perintah ini.")
+        if not await is_group_admin(event):
+            msg = await event.reply("Perintah ini hanya untuk admin grup.")
             await asyncio.sleep(2)
             await msg.delete()
             return
