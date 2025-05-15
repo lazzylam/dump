@@ -1,3 +1,8 @@
+import asyncio
+import os
+import subprocess
+import sys
+from telethon import events
 from Lamora.utils.tol import dev_only
 
 def register(client):
