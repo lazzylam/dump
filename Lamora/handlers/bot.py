@@ -1,4 +1,4 @@
-from lamora.utils.tol import dev_only
+from Lamora.utils.tol import dev_only
 
 def register(client):
     @client.on(events.NewMessage(pattern="/reboot"))
