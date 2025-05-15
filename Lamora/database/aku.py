@@ -1,34 +1,25 @@
-import aiosqlite
-from Lamora.config import db_path
-
 async def init_db():
     async with aiosqlite.connect(db_path) as db:
+        # existing blacklist tables
         await db.execute("CREATE TABLE IF NOT EXISTS blacklist_users (user_id INTEGER PRIMARY KEY)")
         await db.execute("CREATE TABLE IF NOT EXISTS blacklist_words (word TEXT PRIMARY KEY)")
+        # new whitelist tables
+        await db.execute("CREATE TABLE IF NOT EXISTS whitelist_users (user_id INTEGER PRIMARY KEY)")
+        await db.execute("CREATE TABLE IF NOT EXISTS whitelist_words (word TEXT PRIMARY KEY)")
         await db.commit()
 
-async def add_user_blacklist(uid: int):
-    await execute_query("INSERT OR IGNORE INTO blacklist_users VALUES (?)", (uid,))
+async def add_user_whitelist(uid: int):
+    await execute_query("INSERT OR IGNORE INTO whitelist_users VALUES (?)", (uid,))
 
-async def add_word_blacklist(word: str):
-    await execute_query("INSERT OR IGNORE INTO blacklist_words VALUES (?)", (word,))
+async def add_word_whitelist(word: str):
+    await execute_query("INSERT OR IGNORE INTO whitelist_words VALUES (?)", (word,))
 
-async def list_blacklist_users():
-    return await fetch_all("SELECT user_id FROM blacklist_users")
+async def list_whitelist_users():
+    return await fetch_all("SELECT user_id FROM whitelist_users")
 
-async def list_blacklist_words():
-    return await fetch_all("SELECT word FROM blacklist_words")
+async def list_whitelist_words():
+    return await fetch_all("SELECT word FROM whitelist_words")
 
-async def clear_blacklist():
-    await execute_query("DELETE FROM blacklist_users")
-    await execute_query("DELETE FROM blacklist_words")
-
-async def execute_query(query, params=()):
-    async with aiosqlite.connect(db_path) as db:
-        await db.execute(query, params)
-        await db.commit()
-
-async def fetch_all(query, params=()):
-    async with aiosqlite.connect(db_path) as db:
-        cursor = await db.execute(query, params)
-        return await cursor.fetchall()
+async def clear_whitelist():
+    await execute_query("DELETE FROM whitelist_users")
+    await execute_query("DELETE FROM whitelist_words")
