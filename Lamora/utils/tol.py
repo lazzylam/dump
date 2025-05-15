@@ -1,32 +1,27 @@
 import asyncio
-from lamora.config import developer_ids  # list of user_id from .env
+from lamora.config import developer_ids
 
 async def is_developer(event):
     return event.sender_id in developer_ids
 
 async def is_group_admin(event):
-    try:
-        if event.is_group:
-            p = await event.client.get_permissions(event.chat_id, event.sender_id)
-            return p.is_admin
-    except:
-        pass
-    return False
+    if not event.is_group:
+        return False
+    chat = await event.get_chat()
+    participant = await event.client.get_participant(chat.id, event.sender_id)
+    return participant.is_admin or participant.is_creator
 
-async def is_authorized(event):
-    return await is_developer(event) or await is_group_admin(event)
-
-def authorized_only(func):
+def admin_only(func):
     async def wrapper(event):
-        if not await is_authorized(event):
-            msg = await event.reply("Hanya admin atau developer yang bisa menggunakan perintah ini.")
+        if not (await is_developer(event) or await is_group_admin(event)):
+            msg = await event.reply("Hanya admin grup atau developer yang bisa menggunakan perintah ini.")
             await asyncio.sleep(2)
             await msg.delete()
             return
         await func(event)
     return wrapper
 
-def developer_only(func):
+def dev_only(func):
     async def wrapper(event):
         if not await is_developer(event):
             msg = await event.reply("Hanya developer yang bisa menggunakan perintah ini.")
@@ -41,8 +36,10 @@ async def extract_user_id(event):
         reply = await event.get_reply_message()
         return reply.sender_id if reply else None
     try:
-        return int(event.text.split(" ", 1)[1])
-    except:
+        parts = event.text.split(" ", 1)
+        if len(parts) > 1:
+            return int(parts[1])
+    except Exception:
         return None
 
 async def extract_text(event):
@@ -50,6 +47,8 @@ async def extract_text(event):
         reply = await event.get_reply_message()
         return reply.raw_text.strip() if reply else None
     try:
-        return event.text.split(" ", 1)[1].strip()
-    except:
+        parts = event.text.split(" ", 1)
+        if len(parts) > 1:
+            return parts[1].strip()
+    except Exception:
         return None
