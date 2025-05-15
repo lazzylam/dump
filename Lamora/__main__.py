@@ -1,3 +1,4 @@
+import os
 from telethon import TelegramClient
 from Lamora.config import api_id, api_hash, bot_token
 from Lamora.handlers import com, bot
