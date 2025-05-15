@@ -1,5 +1,5 @@
 import asyncio
-from config import admin_ids
+from lamora.config import admin_ids  # disesuaikan sesuai struktur folder
 
 async def is_admin(event):
     return event.sender_id in admin_ids
@@ -16,16 +16,22 @@ def admin_only(func):
 
 async def extract_user_id(event):
     if event.is_reply:
-        return (await event.get_reply_message()).sender_id
+        reply = await event.get_reply_message()
+        return reply.sender_id if reply else None
     try:
-        return int(event.text.split(" ", 1)[1])
-    except:
+        parts = event.text.split(" ", 1)
+        if len(parts) > 1:
+            return int(parts[1])
+    except Exception:
         return None
 
 async def extract_text(event):
     if event.is_reply:
-        return (await event.get_reply_message()).raw_text.strip()
+        reply = await event.get_reply_message()
+        return reply.raw_text.strip() if reply else None
     try:
-        return event.text.split(" ", 1)[1].strip()
-    except:
+        parts = event.text.split(" ", 1)
+        if len(parts) > 1:
+            return parts[1].strip()
+    except Exception:
         return None
